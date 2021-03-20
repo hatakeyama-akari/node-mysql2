@@ -1,20 +1,25 @@
 const config = require('config');
 
-poolExample();
+testWithBluebird();
 
-async function poolExample() {
+async function testWithBluebird() {
   // get the client
   const mysql = require('mysql2/promise');
-  // create the connection
-  const pool = await mysql.createConnection({
+
+  // get the promise implementation, we will use bluebird
+  const bluebird = require('bluebird');
+
+  // create the connection, specify bluebird as Promise
+  const connection = await mysql.createConnection({
     ...config.mysql,
+    Promise: bluebird,
   });
 
   // query database
-  await Promise.all([pool.query('select sleep(10)'), pool.query('select sleep(5)')]);
-  console.log('15 seconds after');
+  const [rows, fields] = await connection.execute('select ?+? as sum', [2, 3]);
+  console.log(rows);
 
-  await pool.end();
-
-  console.log('kitayo');
+  connection.end();
 }
+
+console.log('kitayo');
