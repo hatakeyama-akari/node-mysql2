@@ -1,26 +1,20 @@
 const config = require('config');
 
-main();
+poolExample();
 
-async function main() {
+async function poolExample() {
   // get the client
   const mysql = require('mysql2/promise');
   // create the connection
-  const connection = await mysql.createConnection({
+  const pool = await mysql.createConnection({
     ...config.mysql,
   });
 
   // query database
-  const [
-    rows,
-    fields,
-  ] = await connection.query(
-    'SELECT * FROM `category_master` WHERE `category_id` = ? OR `category_name` = ?',
-    [2, 'leisure']
-  );
-  console.log(rows);
+  await Promise.all([pool.query('select sleep(10)'), pool.query('select sleep(5)')]);
+  console.log('15 seconds after');
 
-  connection.end();
+  await pool.end();
 
   console.log('kitayo');
 }
